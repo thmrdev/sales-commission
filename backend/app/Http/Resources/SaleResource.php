@@ -21,7 +21,7 @@ class SaleResource extends JsonResource
                 'name' => $this->seller->name,
                 'email' => $this->seller->email,
             ],
-            'amount' => $this->amount,
+            'amount' => (float) $this->amount,
             'sale_date' => $this->sale_date->format('Y-m-d'),
         ];
     }
