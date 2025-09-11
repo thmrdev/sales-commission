@@ -18,7 +18,7 @@ class SellerTest extends TestCase
             'email' => 'john@example.com',
         ];
 
-        $response = $this->postJson('/api/sellers', $data);
+        $response = $this->postJson('/api/v1/sellers', $data);
 
         $response->assertStatus(201)
                  ->assertJsonFragment(['email' => 'john@example.com']);
@@ -30,7 +30,7 @@ class SellerTest extends TestCase
     {
         Seller::factory()->count(3)->create();
 
-        $response = $this->getJson('/api/sellers');
+        $response = $this->getJson('/api/v1/sellers');
 
         $response->assertStatus(200)
                  ->assertJsonCount(3);
