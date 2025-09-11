@@ -20,7 +20,7 @@ class SaleTest extends TestCase
             'sale_date' => now()->format('Y-m-d')
         ];
 
-        $response = $this->postJson('/api/sales', $data);
+        $response = $this->postJson('/api/v1/sales', $data);
 
         $response->assertStatus(201)
         ->assertJsonFragment([
@@ -48,7 +48,7 @@ class SaleTest extends TestCase
             'seller_id' => $seller->id
         ]);
 
-        $response = $this->getJson('/api/sales');
+        $response = $this->getJson('/api/v1/sales');
 
         $response->assertStatus(200)
                 ->assertJsonCount(3);
@@ -74,7 +74,7 @@ class SaleTest extends TestCase
             'amount' => 300
         ]);
 
-        $response = $this->getJson("/api/sellers/{$mainSeller->id}/sales");
+        $response = $this->getJson("/api/v1/sellers/{$mainSeller->id}/sales");
 
         $response->assertStatus(200)
                  ->assertJsonCount(2)
