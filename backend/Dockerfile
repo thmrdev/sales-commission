@@ -2,8 +2,12 @@ FROM php:8.2-fpm
 
 # Dependências do sistema
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip libzip-dev \
+    git curl libpng-dev libonig-dev libxml2-dev zip unzip libzip-dev tzdata \
     && docker-php-ext-install pdo_mysql mbstring bcmath zip
+
+# Configurar timezone
+ENV TZ=America/Sao_Paulo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
