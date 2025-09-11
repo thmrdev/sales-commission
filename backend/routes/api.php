@@ -4,16 +4,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SellerController; 
 use App\Http\Controllers\SaleController;
-use App\Http\Controllers\SalesReportController; 
+use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\AuthController; 
 
 Route::prefix('v1')->group(function () {
-    Route::apiResource('sellers', SellerController::class)
-        ->only(['index', 'store']);
+    Route::post('login', [AuthController::class, 'login']);
 
-    Route::apiResource('sales', SaleController::class)
-        ->only(['index', 'store']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::apiResource('sellers', SellerController::class)
+            ->only(['index', 'store']);
 
-    Route::get('sellers/{seller}/sales', [SaleController::class, 'salesBySeller']);
+        Route::apiResource('sales', SaleController::class)
+            ->only(['index', 'store']);
 
-    Route::post('daily-seller-report', [SalesReportController::class, 'sendSellerReport']);
+        Route::get('sellers/{seller}/sales', [SaleController::class, 'salesBySeller']);
+
+        Route::post('daily-seller-report', [SalesReportController::class, 'sendSellerReport']);
+    });
 });
