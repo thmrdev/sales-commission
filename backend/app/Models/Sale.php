@@ -12,8 +12,11 @@ class Sale extends Model
     protected $fillable = [
         'seller_id',
         'amount',
-        'commission',
         'sale_date'
+    ];
+
+    protected $casts = [
+        'sale_date' => 'datetime',
     ];
 
     public function seller()
