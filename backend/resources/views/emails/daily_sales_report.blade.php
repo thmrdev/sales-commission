@@ -11,6 +11,16 @@
             use Carbon\Carbon;
             Carbon::setLocale('pt_BR');
             $dataFormatada = Carbon::now()->timezone('America/Sao_Paulo')->translatedFormat('d \d\e F \d\e Y');
+
+            if ($totalSales == 0) {
+                $mensagem = "Hoje não houve vendas, mas não desanime! Amanhã é um novo dia para conquistar resultados! 💪";
+            } elseif ($totalSales < 5) {
+                $mensagem = "Continue se esforçando! Cada venda conta. 🌟";
+            } elseif ($totalSales < 10) {
+                $mensagem = "Bom trabalho! Você está indo muito bem! 👏";
+            } else {
+                $mensagem = "Excelente desempenho! Continue com esse ritmo incrível! 🚀";
+            }
         @endphp
 
         <h1 style="color: #2c3e50; font-size: 20px;">Relatório Diário de Vendas</h1>
@@ -33,7 +43,7 @@
             </tr>
         </table>
 
-        <p style="margin-top: 20px;">Continue com o ótimo trabalho! 🚀</p>
+        <p style="margin-top: 20px;">{{ $mensagem }}</p>
     </div>
 </body>
 </html>
