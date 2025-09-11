@@ -14,14 +14,45 @@
     submitLabel="Salvar"
     :onSubmit="handleSubmit"
   />
+
+  <div class="p-6">
+    <h1 class="text-xl font-bold mb-4"></h1>
+    <div v-if="isLoading" class="text-gray-500">Carregando...</div>
+    <table v-else class="min-w-full bg-white shadow rounded-lg">
+      <thead>
+        <tr class="bg-gray-100 text-left">
+          <th class="py-2 px-4">ID</th>
+          <th class="py-2 px-4">Nome</th>
+          <th class="py-2 px-4">E-mail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="seller in sellers" :key="seller.id" class="border-b">
+          <td class="py-2 px-4">{{ seller.id }}</td>
+          <td class="py-2 px-4">{{ seller.name }}</td>
+          <td class="py-2 px-4">{{ seller.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import DynamicFormModal from '../components/DynamicFormModal.vue'
+import { useSellersStore } from "../stores/sellers"
+import { storeToRefs } from 'pinia'
 
 const isModalOpen = ref(false)
+
+const sellersStore = useSellersStore()
+const { sellers, isLoading } = storeToRefs(sellersStore)
+const { loadSellers } = sellersStore
+
+onMounted(() => {
+  loadSellers()
+})
 
 const modalFields = [
   { name: 'name', label: 'Nome', placeholder: 'Digite o nome' },
