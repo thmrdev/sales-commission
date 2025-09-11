@@ -10,6 +10,12 @@ use Tests\TestCase;
 class SellerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware(\Illuminate\Auth\Middleware\Authenticate::class);
+    }
     
     public function test_create_seller()
     {
