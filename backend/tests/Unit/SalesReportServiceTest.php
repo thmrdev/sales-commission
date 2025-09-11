@@ -78,4 +78,30 @@ class SalesReportServiceTest extends TestCase
         $this->assertEquals(200, $reports[0]['total_amount']);
         $this->assertEquals(300, $reports[1]['total_amount']);
     }
+
+    public function test_daily_summary_report(): void
+    {
+        $seller1 = Seller::factory()->create();
+        $seller2 = Seller::factory()->create();
+        $date = '2025-09-11';
+
+        Sale::factory()->create([
+            'seller_id' => $seller1->id,
+            'amount' => 400,
+            'sale_date' => $date,
+        ]);
+
+        Sale::factory()->create([
+            'seller_id' => $seller2->id,
+            'amount' => 600,
+            'sale_date' => $date,
+        ]);
+
+        $report = $this->service->dailySummaryReport($date);
+
+        $this->assertEquals(2, $report['total_sales']);
+        $this->assertEquals(1000, $report['total_amount']);
+        $this->assertEquals(100, $report['total_commission']);
+        $this->assertCount(2, $report['sales']);
+    }
 }
