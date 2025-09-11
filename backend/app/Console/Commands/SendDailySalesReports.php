@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use App\Services\SalesReportService;
 use App\Jobs\SendDailySalesReportJob;
 use App\Models\Seller;
+use App\Models\User;
+use App\Jobs\SendDailySummaryReportJob;
 
 class SendDailySalesReports extends Command
 {
@@ -48,5 +50,20 @@ class SendDailySalesReports extends Command
         }
 
         $this->info("All reports queued successfully!");
+
+        $summary = $reportService->dailySummaryReport($date);
+        $admins = User::where('is_admin', true)->get();
+
+        foreach ($admins as $admin) {
+            dispatch(new SendDailySummaryReportJob(
+                $admin->email,
+                $admin->name,
+                $summary['total_sales'],
+                $summary['total_amount'],
+                $summary['total_commission']
+            ));
+
+            $this->info("Queued summary report for admin {$admin->name}");
+        }
     }
 }
