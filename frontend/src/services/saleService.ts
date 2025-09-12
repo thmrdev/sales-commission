@@ -17,3 +17,8 @@ export async function fetchSales(): Promise<Sale[]> {
   const { data } = await http.get<Sale[]>("/sales")
   return data
 }
+
+export async function createSaleService(payload: Partial<Sale>): Promise<Sale> {
+  const { data } = await http.post('/sales', payload)
+  return data
+}

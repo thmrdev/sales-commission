@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
-import { fetchSales, type Sale } from "../services/saleService"
+import { fetchSales, createSaleService, type Sale } from "../services/saleService"
 
 export const useSalesStore = defineStore("sales", () => {
   const sales = ref<Sale[]>([])
@@ -15,5 +15,15 @@ export const useSalesStore = defineStore("sales", () => {
     }
   }
 
-  return { sales, isLoading, loadSales }
+  async function createSale(data: Partial<Sale>) {
+      isLoading.value = true
+      try {
+        const newSale = await createSaleService(data)
+        sales.value.push(newSale)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+  return { sales, isLoading, loadSales, createSale }
 })
