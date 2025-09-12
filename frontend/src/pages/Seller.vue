@@ -38,13 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import DynamicFormModal from '../components/DynamicFormModal.vue'
 import { useSellersStore } from "../stores/sellers"
 import { storeToRefs } from 'pinia'
 
 const isModalOpen = ref(false)
+const formData = ref({ name: '', email: '' })
 
 const sellersStore = useSellersStore()
 const { sellers, isLoading } = storeToRefs(sellersStore)
@@ -59,11 +60,23 @@ const modalFields = [
   { name: 'email', label: 'Email', placeholder: 'Digite o email' }
 ]
 
+watch(isModalOpen, (newVal) => {
+  if (newVal) {
+    formData.value = { name: '', email: '' }
+  }
+})
+
 const openModal = () => {
   isModalOpen.value = true
 }
 
-const handleSubmit = (data: Record<string, any>) => {
-  console.log('Dados do vendedor:', data)
+const handleSubmit = async (data: Record<string, any>) => {
+  try {
+    await sellersStore.createSeller(data)
+    isModalOpen.value = false
+    loadSellers()
+  } catch (error) {
+    console.error('Erro ao criar vendedor:', error)
+  }
 }
 </script>
