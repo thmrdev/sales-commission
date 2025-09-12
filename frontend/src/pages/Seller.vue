@@ -24,6 +24,7 @@
           <th class="py-2 px-4">ID</th>
           <th class="py-2 px-4">Nome</th>
           <th class="py-2 px-4">E-mail</th>
+          <th class="py-2 px-4">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -31,6 +32,18 @@
           <td class="py-2 px-4">{{ seller.id }}</td>
           <td class="py-2 px-4">{{ seller.name }}</td>
           <td class="py-2 px-4">{{ seller.email }}</td>
+          <td class="py-2 px-4 w-32">
+            <div class="flex justify-center">
+              <button
+                @click="handleResend(seller.id)"
+                :disabled="isResending === seller.id"
+                class="truncate bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-600 disabled:opacity-50"
+                style="max-width: 100%;"
+              >
+                {{ isResending === seller.id ? 'Enviando...' : 'Reenviar' }}
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -43,6 +56,9 @@ import PageHeader from '../components/PageHeader.vue'
 import DynamicFormModal from '../components/DynamicFormModal.vue'
 import { useSellersStore } from "../stores/sellers"
 import { storeToRefs } from 'pinia'
+import http from '../api/http'
+
+const isResending = ref<number | null>(null)
 
 const isModalOpen = ref(false)
 const formData = ref({ name: '', email: '' })
@@ -77,6 +93,20 @@ const handleSubmit = async (data: Record<string, any>) => {
     loadSellers()
   } catch (error) {
     console.error('Erro ao criar vendedor:', error)
+  }
+}
+
+const handleResend = async (sellerId: number) => {
+  try {
+    isResending.value = sellerId
+    // Chamada para seu endpoint
+    http.post(`/daily-seller-report`, { seller_id: sellerId})
+    // Pode exibir um toast de sucesso aqui
+    console.log(`Email reenviado para seller ${sellerId}`)
+  } catch (error) {
+    console.error('Erro ao reenviar email:', error)
+  } finally {
+    isResending.value = null
   }
 }
 </script>
