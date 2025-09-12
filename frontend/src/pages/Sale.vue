@@ -38,42 +38,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import DynamicFormModal from '../components/DynamicFormModal.vue'
 import { useSalesStore } from "../stores/sales"
+import { useSellersStore } from "../stores/sellers"
 import { storeToRefs } from 'pinia'
 
 const isModalOpen = ref(false)
 
 const salesStore = useSalesStore()
 const { sales, isLoading } = storeToRefs(salesStore)
-const { loadSales } = salesStore
+const { loadSales, createSale } = salesStore
 
-onMounted(() => {
+const sellersStore = useSellersStore()
+const { sellers: sellersList, isLoading: sellersLoading } = storeToRefs(sellersStore)
+const { loadSellers } = sellersStore
+
+onMounted(async () => {
+  await loadSellers()
   loadSales()
 })
 
-const sellers = [
-  { label: 'João Silva', value: 1 },
-  { label: 'Maria Souza', value: 2 },
-  { label: 'Carlos Pereira', value: 3 }
-]
+const sellerOptions = computed(() =>
+  sellersList.value.map(s => ({ label: s.name, value: s.id }))
+)
 
-const modalFields = [
-  { name: 'seller_id', label: 'Vendedor', placeholder: 'Selecione o vendedor', type: 'select', options: sellers },
+const modalFields = computed(() => [
+  { name: 'seller_id', label: 'Vendedor', placeholder: 'Selecione o vendedor', type: 'select', options: sellerOptions.value },
   { name: 'amount', label: 'R$', placeholder: 'Informe o valor' }
-]
+])
 
 const openModal = () => {
   isModalOpen.value = true
 }
 
-const handleSubmit = (data: Record<string, any>) => {
-  console.log('Dados da venda:', data)
+const handleSubmit = async (data: Record<string, any>) => {
+  try {
+    const payload = {
+      seller_id: data.seller_id,
+      amount: parseCurrency(data.amount),
+      sale_date: new Date().toISOString().split('T')[0]
+    }
+    await salesStore.createSale(payload)
+    isModalOpen.value = false
+    loadSales()
+  } catch (error) {
+    console.error('Erro ao criar venda:', error)
+  }
 }
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
+
+function parseCurrency(value: string): number {
+  return Number(value.replace(/\./g, '').replace(',', '.'))
+}
 </script>
+
